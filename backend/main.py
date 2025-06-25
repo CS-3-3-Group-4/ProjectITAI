@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field # type: ignore
 from typing import List
 import json
 import time
+import PSO
 
 app = FastAPI()
 
@@ -49,16 +50,18 @@ def login(data: LoginRequest):
 # Simulate endpoint to process barangay data
 @app.post("/simulate")
 def simulate(barangays: List[BarangayData]):
-    print("Received barangay data:")
-    print(json.dumps([b.model_dump() for b in barangays], indent=2))
+    print("Received barangay data for simulation...")
 
-    # Simulate a long computation (10–20 seconds)
-    delay = 10 + (time.time() % 10)  # Random-ish delay between 10–20
-    print(f"Simulating long task for {delay:.1f} seconds...")
-    time.sleep(delay)
+    # Convert Pydantic objects to a list of simple dictionaries
+    barangay_input_data = [b.model_dump() for b in barangays]
 
-    # Example dummy processing:
-    total = sum(
-        b.personnel.srr + b.personnel.health + b.personnel.log for b in barangays
-    )
-    return {"message": f"{len(barangays)} barangays received. Total personnel: {total}"}
+    print("Starting PSO simulation...")
+
+    # CORRECTED LINE:
+    # Call the run_pso_simulation function from the PSO module
+    pso_result = PSO.run_pso_simulation(barangay_input_data)
+
+    print("PSO simulation finished.")
+
+    # You can now return the detailed results from the PSO
+    return {"message": f"{pso_result}"}
