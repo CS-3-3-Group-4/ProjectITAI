@@ -24,5 +24,10 @@ export function useMutation<TData, TVariables>(
     }
   };
 
-  return { mutate, data, loading, error };
+  const reset = () => {
+    setData(null);
+    setError(null);
+  };
+
+  return { mutate, data, loading, error, reset };
 }
