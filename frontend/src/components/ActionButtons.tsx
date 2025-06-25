@@ -11,7 +11,6 @@ import {
 import type { BarangayData } from "../types";
 import { initialBarangays } from "@/barangays";
 import { useMutation } from "@/hooks/useMutation";
-import { simulate } from "@/lib/simulate";
 
 interface ActionButtonsProps {
   barangays: BarangayData[];
@@ -24,10 +23,12 @@ export function ActionButtons({ barangays, setBarangays }: ActionButtonsProps) {
     data: simulationResult,
     loading: isSubmitting,
     error,
+    reset,
   } = useMutation(simulate);
 
   const handleReset = () => {
     setBarangays(initialBarangays);
+    reset();
   };
 
   const handleSubmit = async () => {
@@ -37,6 +38,35 @@ export function ActionButtons({ barangays, setBarangays }: ActionButtonsProps) {
       console.error("Simulation failed.");
     }
   };
+
+  async function simulate(barangays: BarangayData[]): Promise<string> {
+    // Strip frontend-only `coordinates` field
+    const payload = barangays.map(({ id, name, waterLevel, personnel }) => ({
+      id,
+      name,
+      waterLevel,
+      personnel,
+    }));
+
+    const res = await fetch("http://localhost:8000/simulate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      const message = Array.isArray(err.detail)
+        ? err.detail[0].msg
+        : err.detail || "Something went wrong";
+      throw new Error(message);
+    }
+
+    const data = await res.json();
+    return data.message;
+  }
 
   return (
     <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
