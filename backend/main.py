@@ -5,6 +5,7 @@ from typing import List
 import json
 import time
 import PSO
+import FA
 
 app = FastAPI()
 
@@ -57,13 +58,12 @@ def simulate(barangays: List[BarangayData]):
 
     print("Starting PSO simulation...")
 
-    # CORRECTED LINE:
-    # Call the run_pso_simulation function from the PSO module
+    # Call the run_[algo]_simulation function from the algorithm module
     pso_result = PSO.run_pso_simulation(barangay_input_data)
+    fa_result = FA.run_fa_simulation(barangay_input_data)
 
     print("PSO simulation finished.")
 
-    # You can now return the result of the PSO simulation
     # Result is in array format:
     # [Barangay Name, Personnel Allocation (SRR, Health, Log), Fitness Score, Execution Time]
-    return {"message": f"{pso_result}"}
+    return {"message": f"{pso_result, fa_result}"}
