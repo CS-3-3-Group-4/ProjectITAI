@@ -1,6 +1,7 @@
 ## 🚀 Getting Started
 
 This project is structured with separate **frontend** and **backend** directories.
+Sample
 
 ---
 
@@ -10,8 +11,8 @@ This project is structured with separate **frontend** and **backend** directorie
 
 #### Requirements
 
--   [Node.js](https://nodejs.org/) (v18 or later)
--   npm (comes with Node)
+- [Node.js](https://nodejs.org/) (v18 or later)
+- npm (comes with Node)
 
 #### Setup
 
@@ -31,7 +32,7 @@ The frontend will be available at: [http://localhost:5173](http://localhost:5173
 
 #### Requirements
 
--   [Python](https://www.python.org/) 3.10 or later
+- [Python](https://www.python.org/) 3.10 or later
 
 #### Setup
 
