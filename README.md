@@ -1,7 +1,6 @@
 ## 🚀 Getting Started
 
 This project is structured with separate **frontend** and **backend** directories.
-Sample
 
 ---
 
