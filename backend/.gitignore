@@ -1,0 +1,20 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+env/
+venv/
+ENV/
+.venv/
+
+# macOS
+.DS_Store
+
+# dotenv file 
+.env
+
+# OS or editor-specific
+*.swp
+Thumbs.db
