@@ -19,7 +19,8 @@ class FAPersonnelAllocator:
         self.weights = weights
         self.lambda_c = lambda_c
 
-        self.target_barangays = {b_name: b_data for b_name, b_data in self.barangay_data.items() if self.flood_levels.get(b_name, 0) > 1}
+        # --- UPDATED: Changed the threshold for affected areas ---
+        self.target_barangays = {b_name: b_data for b_name, b_data in self.barangay_data.items() if self.flood_levels.get(b_name, 0) >= 0.5}
         self.num_target_barangays = len(self.target_barangays)
 
         self.total_personnel = {
@@ -262,7 +263,6 @@ def run_fa_simulation(barangay_input_data):
     print("\n[ITERATION LOG]")
     for log_entry in iteration_log:
         print(f"  Iteration {log_entry['iteration']} -> Best Fitness: {log_entry['fitness_score']:.4f}")
-        # To avoid clutter, we don't print the full allocation every 50 iterations, just the score.
 
     # Log Final Result
     print("\n[FINAL RESULT]")

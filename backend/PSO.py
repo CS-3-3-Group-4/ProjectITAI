@@ -18,7 +18,8 @@ class PSOPersonnelAllocator:
         self.weights = weights
         self.lambda_c = lambda_c
 
-        self.target_barangays = {b_name: b_data for b_name, b_data in self.barangay_data.items() if self.flood_levels.get(b_name, 0) > 1}
+        # --- UPDATED: Changed the threshold for affected areas ---
+        self.target_barangays = {b_name: b_data for b_name, b_data in self.barangay_data.items() if self.flood_levels.get(b_name, 0) >= 0.5}
         self.num_target_barangays = len(self.target_barangays)
 
         self.total_personnel = {
@@ -157,7 +158,6 @@ class PSOPersonnelAllocator:
                 social_vel = self.pso_params['c2'] * r2 * (gbest_pos - particles_pos[j])
                 particles_vel[j] = self.pso_params['w'] * particles_vel[j] + cognitive_vel + social_vel
 
-                # --- FIX 1: Use rounding instead of flooring ---
                 particles_pos[j] = np.round(particles_pos[j] + particles_vel[j])
                 particles_pos[j] = np.maximum(0, particles_pos[j])
                 particles_pos[j] = self._enforce_constraints(particles_pos[j])
@@ -167,7 +167,6 @@ class PSOPersonnelAllocator:
                     pbest_fitness[j] = current_fitness
                     pbest_pos[j] = particles_pos[j].copy()
 
-                    # --- FIX 2: Eagerly update global best ---
                     if current_fitness > gbest_fitness:
                         gbest_fitness = current_fitness
                         gbest_pos = particles_pos[j].copy()
@@ -252,10 +251,7 @@ def run_pso_simulation(barangay_input_data):
     # Log Iteration Progress
     print("\n[ITERATION LOG]")
     for log_entry in iteration_log:
-        print(f"  Iteration {log_entry['iteration']}:")
-        print(f"    - Fitness Score: {log_entry['fitness_score']:.4f}")
-        for name, p_alloc in log_entry['allocation'].items():
-            print(f"    - {name}: SRR-{p_alloc['srr']}, HEALTH-{p_alloc['health']}, LOG-{p_alloc['log']}")
+        print(f"  Iteration {log_entry['iteration']} -> Best Fitness: {log_entry['fitness_score']:.4f}")
 
     # Log Final Result
     print("\n[FINAL RESULT]")
