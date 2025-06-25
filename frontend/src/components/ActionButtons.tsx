@@ -1,28 +1,41 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { RotateCcw, Play, Loader2, CheckCircle } from "lucide-react";
+import {
+  RotateCcw,
+  Play,
+  Loader2,
+  CheckCircle,
+  AlertTriangle,
+} from "lucide-react";
 import type { BarangayData } from "../types";
+import { initialBarangays } from "@/barangays";
+import { useMutation } from "@/hooks/useMutation";
+import { simulate } from "@/lib/simulate";
 
 interface ActionButtonsProps {
   barangays: BarangayData[];
-  onReset: () => void;
-  onSubmit: (data: BarangayData[]) => void;
-  isSubmitting: boolean;
-  simulationResult: string | null;
+  setBarangays: (data: BarangayData[]) => void;
 }
 
-export function ActionButtons({
-  barangays,
-  onReset,
-  onSubmit,
-  isSubmitting,
-  simulationResult,
-}: ActionButtonsProps) {
-  const handleSubmit = () => {
-    onSubmit(barangays);
+export function ActionButtons({ barangays, setBarangays }: ActionButtonsProps) {
+  const {
+    mutate: runSimulation,
+    data: simulationResult,
+    loading: isSubmitting,
+    error,
+  } = useMutation(simulate);
+
+  const handleReset = () => {
+    setBarangays(initialBarangays);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      await runSimulation(barangays);
+    } catch {
+      console.error("Simulation failed.");
+    }
   };
 
   return (
@@ -31,7 +44,7 @@ export function ActionButtons({
         <div className="flex flex-col sm:flex-row gap-4 items-start">
           <div className="flex gap-3">
             <Button
-              onClick={onReset}
+              onClick={handleReset}
               variant="outline"
               disabled={isSubmitting}
               className="h-11 px-6 border-2 hover:bg-slate-50"
@@ -75,6 +88,17 @@ export function ActionButtons({
             <CheckCircle className="h-4 w-4 text-green-600" />
             <AlertDescription className="text-green-800 font-medium">
               {simulationResult}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {Boolean(error) && (
+          <Alert className="mt-4 border-red-200 bg-red-50">
+            <AlertTriangle className="h-4 w-4 text-red-600" />
+            <AlertDescription className="text-red-800 font-medium">
+              {error instanceof Error
+                ? error.message
+                : "Simulation failed. Please try again."}
             </AlertDescription>
           </Alert>
         )}
