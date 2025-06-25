@@ -19,7 +19,7 @@ class FAPersonnelAllocator:
         self.weights = weights
         self.lambda_c = lambda_c
 
-        # --- UPDATED: Changed the threshold for affected areas ---
+        # --- Threshold for affected areas ---
         self.target_barangays = {b_name: b_data for b_name, b_data in self.barangay_data.items() if self.flood_levels.get(b_name, 0) >= 0.5}
         self.num_target_barangays = len(self.target_barangays)
 
@@ -44,7 +44,7 @@ class FAPersonnelAllocator:
             }
         return demand
 
-    # --- Objective Functions (Identical to PSO for fair comparison) ---
+    # --- Objective Functions ---
     def _objective1_coverage(self, allocation):
         if not self.target_barangays: return 0
         zones_with_personnel = sum(1 for barangay_alloc in allocation.values() if sum(barangay_alloc.values()) > 0)
@@ -154,7 +154,6 @@ class FAPersonnelAllocator:
             "fitness_score": float(best_light_intensity)
         }
 
-        # --- Prepare for iteration logging ---
         iteration_log = []
 
         # FA main loop
@@ -229,7 +228,7 @@ def run_fa_simulation(barangay_input_data):
     personnel_availability = {b['name']: b['personnel'] for b in barangay_input_data}
     flood_levels = {b['name']: b['waterLevel'] for b in barangay_input_data}
 
-    # FA Parameters - Aligned with PSO for direct comparison
+    # FA Parameters
     fa_params = {'iterations': 300, 'num_fireflies': 100, 'alpha': 0.5, 'beta0': 1.0, 'gamma': 0.01}
     weights = {'w1': 0.2, 'w2': 0.2, 'w3': 0.2, 'w4': 0.2, 'w5': 0.2}
     lambda_c = {'srr': 0.5, 'health': 0.3, 'log': 0.2}
@@ -289,7 +288,7 @@ def run_fa_simulation(barangay_input_data):
 
 
 if __name__ == '__main__':
-    # Test harness
+
     print("--- Running FA Test Simulation ---")
 
     sample_frontend_data = [

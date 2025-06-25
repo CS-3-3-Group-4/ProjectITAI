@@ -18,7 +18,7 @@ class PSOPersonnelAllocator:
         self.weights = weights
         self.lambda_c = lambda_c
 
-        # --- UPDATED: Changed the threshold for affected areas ---
+        # --- Threshold for affected areas ---
         self.target_barangays = {b_name: b_data for b_name, b_data in self.barangay_data.items() if self.flood_levels.get(b_name, 0) >= 0.5}
         self.num_target_barangays = len(self.target_barangays)
 
@@ -43,7 +43,7 @@ class PSOPersonnelAllocator:
             }
         return demand
 
-    # --- Objective Functions (No changes here) ---
+    # --- Objective Functions ---
     def _objective1_coverage(self, allocation):
         if not self.target_barangays: return 0
         zones_with_personnel = sum(1 for barangay_alloc in allocation.values() if sum(barangay_alloc.values()) > 0)
@@ -278,7 +278,7 @@ def run_pso_simulation(barangay_input_data):
 
 
 if __name__ == '__main__':
-    # Test harness now shows the array return structure with execution time
+
     print("--- Running Test Simulation ---")
 
     sample_frontend_data = [
@@ -290,7 +290,6 @@ if __name__ == '__main__':
         {"id": "26", "name": "Wack-Wack Greenhills", "waterLevel": 0.2, "personnel": {"srr": 2, "health": 2, "log": 1}}
     ]
 
-    # The function will now print logs internally and return a simple list.
     simulation_result = run_pso_simulation(sample_frontend_data)
 
     print("\n--- FUNCTION RETURN VALUE ---")
