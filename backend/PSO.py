@@ -1,5 +1,6 @@
 import numpy as np
 import json
+import time
 
 class PSOPersonnelAllocator:
     """
@@ -108,7 +109,7 @@ class PSOPersonnelAllocator:
             total_available = self.total_personnel[p_type]
             if total_allocated > total_available:
                 ratio = total_available / total_allocated if total_allocated > 0 else 0
-                particle[i::3] = np.floor(allocations * ratio)
+                particle[i::3] = np.round(allocations * ratio)
         return particle
 
     def run_pso(self):
@@ -116,7 +117,6 @@ class PSOPersonnelAllocator:
         Executes the PSO algorithm and returns detailed logs.
         """
         if self.num_target_barangays == 0:
-            print("No barangays with flood levels > 1 meter. No allocation needed.")
             # Return a structure indicating no run was performed
             return { "allocation": {}, "fitness_score": 0 }, [], { "allocation": {}, "fitness_score": 0 }
 
@@ -130,7 +130,7 @@ class PSOPersonnelAllocator:
             particles_pos[:, i*3] *= self.total_personnel['srr'] + 1
             particles_pos[:, i*3+1] *= self.total_personnel['health'] + 1
             particles_pos[:, i*3+2] *= self.total_personnel['log'] + 1
-        particles_pos = np.floor(particles_pos)
+        particles_pos = np.round(particles_pos)
 
         particles_vel = np.zeros((num_particles, dim))
         pbest_pos = np.copy(particles_pos)
@@ -143,7 +143,7 @@ class PSOPersonnelAllocator:
         # --- Capture Initial State ---
         initial_state = {
             "allocation": self._decode_particle(gbest_pos),
-            "fitness_score": gbest_fitness
+            "fitness_score": float(gbest_fitness)
         }
 
         # --- Prepare for iteration logging ---
@@ -157,7 +157,8 @@ class PSOPersonnelAllocator:
                 social_vel = self.pso_params['c2'] * r2 * (gbest_pos - particles_pos[j])
                 particles_vel[j] = self.pso_params['w'] * particles_vel[j] + cognitive_vel + social_vel
 
-                particles_pos[j] = np.floor(particles_pos[j] + particles_vel[j])
+                # --- FIX 1: Use rounding instead of flooring ---
+                particles_pos[j] = np.round(particles_pos[j] + particles_vel[j])
                 particles_pos[j] = np.maximum(0, particles_pos[j])
                 particles_pos[j] = self._enforce_constraints(particles_pos[j])
 
@@ -166,24 +167,23 @@ class PSOPersonnelAllocator:
                     pbest_fitness[j] = current_fitness
                     pbest_pos[j] = particles_pos[j].copy()
 
-            current_gbest_idx = np.argmax(pbest_fitness)
-            if pbest_fitness[current_gbest_idx] > gbest_fitness:
-                gbest_fitness = pbest_fitness[current_gbest_idx]
-                gbest_pos = pbest_pos[current_gbest_idx].copy()
+                    # --- FIX 2: Eagerly update global best ---
+                    if current_fitness > gbest_fitness:
+                        gbest_fitness = current_fitness
+                        gbest_pos = particles_pos[j].copy()
 
             # --- Log progress every 50 iterations ---
             if (i + 1) % 50 == 0:
-                print(f"PSO Iteration {i+1}/{num_iterations}, Best Fitness: {gbest_fitness:.4f}")
                 iteration_log.append({
                     "iteration": i + 1,
-                    "fitness_score": gbest_fitness,
+                    "fitness_score": float(gbest_fitness),
                     "allocation": self._decode_particle(gbest_pos)
                 })
 
         # --- Capture Final State ---
         final_result = {
             "allocation": self._decode_particle(gbest_pos),
-            "fitness_score": gbest_fitness
+            "fitness_score": float(gbest_fitness)
         }
 
         return initial_state, iteration_log, final_result
@@ -192,7 +192,8 @@ class PSOPersonnelAllocator:
 def run_pso_simulation(barangay_input_data):
     """
     Main function to run the PSO simulation.
-    This function now prints the detailed results to the terminal.
+    This function now prints detailed results and execution time to the terminal
+    and returns the final allocation, fitness score, and execution time.
     """
     # Static Data
     static_barangay_data = {
@@ -221,7 +222,7 @@ def run_pso_simulation(barangay_input_data):
     weights = {'w1': 0.2, 'w2': 0.2, 'w3': 0.2, 'w4': 0.2, 'w5': 0.2}
     lambda_c = {'srr': 0.5, 'health': 0.3, 'log': 0.2}
 
-    # Initialize and Run Simulation
+    # Initialize Simulation
     allocator = PSOPersonnelAllocator(static_barangay_data, personnel_availability, flood_levels, pso_params, weights, lambda_c)
 
     print("\nTotal Available Personnel Received from Frontend:")
@@ -229,28 +230,59 @@ def run_pso_simulation(barangay_input_data):
     print(f"  HEALTH: {allocator.total_personnel['health']}")
     print(f"  LOG: {allocator.total_personnel['log']}")
 
+    # --- Run Simulation and Measure Time ---
+    start_time = time.time()
     initial_state, iteration_log, final_result = allocator.run_pso()
+    end_time = time.time()
+    execution_time = end_time - start_time
 
-    # --- Collate and print the results to the terminal ---
-    full_result = {
-        "initial_state": initial_state,
-        "iteration_log": iteration_log,
-        "final_result": final_result,
-        "total_personnel": allocator.total_personnel,
-        "target_barangays_count": allocator.num_target_barangays,
-    }
+    # --- Log results to the terminal in a readable format ---
+    print("\n--- PSO SIMULATION LOG ---")
 
-    print("\n--- FULL PSO SIMULATION RESULT ---")
-    print(json.dumps(full_result, indent=2))
-    print("--- END OF SIMULATION RESULT ---\n")
+    # Log Initial State
+    print("\n[INITIAL STATE]")
+    print(f"  Initial Fitness Score: {initial_state['fitness_score']:.4f}")
+    if initial_state['allocation']:
+        print("  Initial Allocation:")
+        for name, p_alloc in initial_state['allocation'].items():
+            print(f"    - {name}: SRR-{p_alloc['srr']}, HEALTH-{p_alloc['health']}, LOG-{p_alloc['log']}")
+    else:
+        print("  Initial Allocation: None")
 
-    # This function now primarily prints to the console.
-    # We can return None or a simple message.
-    return full_result
+    # Log Iteration Progress
+    print("\n[ITERATION LOG]")
+    for log_entry in iteration_log:
+        print(f"  Iteration {log_entry['iteration']}:")
+        print(f"    - Fitness Score: {log_entry['fitness_score']:.4f}")
+        for name, p_alloc in log_entry['allocation'].items():
+            print(f"    - {name}: SRR-{p_alloc['srr']}, HEALTH-{p_alloc['health']}, LOG-{p_alloc['log']}")
+
+    # Log Final Result
+    print("\n[FINAL RESULT]")
+    print(f"  Final Fitness Score: {final_result['fitness_score']:.4f}")
+    if final_result['allocation']:
+        print("  Final Allocation Strategy:")
+        for name, p_alloc in final_result['allocation'].items():
+            print(f"    - {name}: SRR-{p_alloc['srr']}, HEALTH-{p_alloc['health']}, LOG-{p_alloc['log']}")
+    else:
+        print("  Final Allocation: None")
+
+    # Log Execution Time
+    print("\n[EXECUTION TIME]")
+    print(f"  Total execution time: {execution_time:.4f} seconds")
+
+    print("\n--- END OF SIMULATION LOG ---\n")
+
+    # Return the final allocation, fitness score, and execution time as a list (array)
+    return [
+        final_result['allocation'],
+        final_result['fitness_score'],
+        float(execution_time)
+    ]
 
 
 if __name__ == '__main__':
-    # Test harness now shows the new data structure
+    # Test harness now shows the array return structure with execution time
     print("--- Running Test Simulation ---")
 
     sample_frontend_data = [
@@ -262,5 +294,9 @@ if __name__ == '__main__':
         {"id": "26", "name": "Wack-Wack Greenhills", "waterLevel": 0.2, "personnel": {"srr": 2, "health": 2, "log": 1}}
     ]
 
-    # The function will now print the results internally.
-    run_pso_simulation(sample_frontend_data)
+    # The function will now print logs internally and return a simple list.
+    simulation_result = run_pso_simulation(sample_frontend_data)
+
+    print("\n--- FUNCTION RETURN VALUE ---")
+    print(json.dumps(simulation_result, indent=2))
+    print("--- END OF RETURN VALUE ---")

@@ -63,5 +63,7 @@ def simulate(barangays: List[BarangayData]):
 
     print("PSO simulation finished.")
 
-    # You can now return the detailed results from the PSO
+    # You can now return the result of the PSO simulation
+    # Result is in array format:
+    # [Barangay Name, Personnel Allocation (SRR, Health, Log), Fitness Score, Execution Time]
     return {"message": f"{pso_result}"}
