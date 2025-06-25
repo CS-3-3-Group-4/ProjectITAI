@@ -38,9 +38,11 @@ The frontend will be available at: [http://localhost:5173](http://localhost:5173
 ```bash
 cd backend
 python -m venv env
+
 # Activate the virtual environment:
 # On Windows:
 env\Scripts\activate
+
 # On macOS/Linux:
 source env/bin/activate
 
@@ -49,3 +51,21 @@ uvicorn main:app --reload
 ```
 
 The backend API will be available at: [http://localhost:8000](http://localhost:8000)
+
+---
+
+### 📦 Installing Additional Python Packages
+
+If you install a new package with `pip install`, make sure to update `requirements.txt` so others can stay in sync:
+
+```bash
+pip install <package-name>
+pip freeze > requirements.txt
+```
+
+> ✅ Example:
+>
+> ```bash
+> pip install requests
+> pip freeze > requirements.txt
+> ```
