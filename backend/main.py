@@ -56,13 +56,16 @@ def simulate(barangays: List[BarangayData]):
     # Convert Pydantic objects to a list of simple dictionaries
     barangay_input_data = [b.model_dump() for b in barangays]
 
-    print("Starting PSO simulation...")
-
     # Call the run_[algo]_simulation function from the algorithm module
+    print("--------------------------------------------------------")
+    print("\nStarting PSO simulation...")
     pso_result = PSO.run_pso_simulation(barangay_input_data)
+    print("PSO simulation finished.\n")
+    print("--------------------------------------------------------")
+    print("\nStarting FA simulation...")
     fa_result = FA.run_fa_simulation(barangay_input_data)
-
-    print("PSO simulation finished.")
+    print("FA simulation finished.")
+    print("--------------------------------------------------------")
 
     # Result is in array format:
     # [Barangay Name, Personnel Allocation (SRR, Health, Log), Fitness Score, Execution Time]
