@@ -73,7 +73,7 @@ export function InteractiveMap({
 
                   {/* Personnel indicator */}
                   {hasPersonnelData(barangay.personnel) && (
-                    <div className="w-2 h-2 bg-green-600 rounded-full border border-white shadow-sm">
+                    <div className="w-2 h-2 bg-lime-600 rounded-full border border-white shadow-sm">
                       <Users className="w-1 h-1 text-white opacity-0" />
                     </div>
                   )}
@@ -101,7 +101,7 @@ export function InteractiveMap({
                         )}
                         {hasPersonnelData(barangay.personnel) && (
                           <span className="flex items-center gap-1">
-                            <div className="w-1.5 h-1.5 bg-green-600 rounded-full"></div>
+                            <div className="w-1.5 h-1.5 bg-lime-600 rounded-full"></div>
                             Personnel Set
                           </span>
                         )}
@@ -154,7 +154,7 @@ export function InteractiveMap({
                 <span className="text-slate-600">Water Level Set</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-600 rounded-full shadow-sm"></div>
+                <div className="w-3 h-3 bg-lime-600 rounded-full shadow-sm"></div>
                 <span className="text-slate-600">Personnel Assigned</span>
               </div>
             </div>
