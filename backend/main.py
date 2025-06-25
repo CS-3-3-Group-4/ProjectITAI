@@ -23,7 +23,7 @@ class Personnel(BaseModel):
 class BarangayData(BaseModel):
     id: str
     name: str
-    waterLevel: int
+    waterLevel: float
     personnel: Personnel
 
     # Login request schema with validation
