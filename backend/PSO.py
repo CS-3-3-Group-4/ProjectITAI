@@ -18,7 +18,6 @@ class PSOPersonnelAllocator:
         self.weights = weights
         self.lambda_c = lambda_c
 
-        # --- Threshold for affected areas ---
         self.target_barangays = {b_name: b_data for b_name, b_data in self.barangay_data.items() if self.flood_levels.get(b_name, 0) >= 0.5}
         self.num_target_barangays = len(self.target_barangays)
 
@@ -43,7 +42,7 @@ class PSOPersonnelAllocator:
             }
         return demand
 
-    # --- Objective Functions ---
+    # --- Objective Functions (No changes here) ---
     def _objective1_coverage(self, allocation):
         if not self.target_barangays: return 0
         zones_with_personnel = sum(1 for barangay_alloc in allocation.values() if sum(barangay_alloc.values()) > 0)
@@ -118,7 +117,6 @@ class PSOPersonnelAllocator:
         Executes the PSO algorithm and returns detailed logs.
         """
         if self.num_target_barangays == 0:
-            # Return a structure indicating no run was performed
             return { "allocation": {}, "fitness_score": 0 }, [], { "allocation": {}, "fitness_score": 0 }
 
         num_particles = self.pso_params['num_particles']
@@ -132,6 +130,10 @@ class PSOPersonnelAllocator:
             particles_pos[:, i*3+1] *= self.total_personnel['health'] + 1
             particles_pos[:, i*3+2] *= self.total_personnel['log'] + 1
         particles_pos = np.round(particles_pos)
+
+        # --- BUG FIX: Enforce constraints on the initial random population ---
+        for j in range(num_particles):
+            particles_pos[j] = self._enforce_constraints(particles_pos[j])
 
         particles_vel = np.zeros((num_particles, dim))
         pbest_pos = np.copy(particles_pos)
@@ -191,8 +193,6 @@ class PSOPersonnelAllocator:
 def run_pso_simulation(barangay_input_data):
     """
     Main function to run the PSO simulation.
-    This function now prints detailed results and execution time to the terminal
-    and returns the final allocation, fitness score, and execution time.
     """
     # Static Data
     static_barangay_data = {
@@ -278,18 +278,19 @@ def run_pso_simulation(barangay_input_data):
 
 
 if __name__ == '__main__':
-
+    # Test harness now shows the array return structure with execution time
     print("--- Running Test Simulation ---")
 
     sample_frontend_data = [
-        {"id": "0", "name": "Addition Hills", "waterLevel": 2.5, "personnel": {"srr": 10, "health": 8, "log": 5}},
-        {"id": "1", "name": "Bagong Silang", "waterLevel": 0.5, "personnel": {"srr": 5, "health": 5, "log": 5}},
-        {"id": "2", "name": "Barangka Drive", "waterLevel": 1.1, "personnel": {"srr": 3, "health": 2, "log": 4}},
-        {"id": "3", "name": "Barangka Ibaba", "waterLevel": 3.0, "personnel": {"srr": 15, "health": 12, "log": 10}},
-        {"id": "25", "name": "Vergara", "waterLevel": 0.0, "personnel": {"srr": 0, "health": 0, "log": 0}},
-        {"id": "26", "name": "Wack-Wack Greenhills", "waterLevel": 0.2, "personnel": {"srr": 2, "health": 2, "log": 1}}
+        {"id": "0", "name": "Addition Hills", "waterLevel": 2.5, "personnel": {"srr": 400, "health": 400, "log": 400}},
+        {"id": "1", "name": "Bagong Silang", "waterLevel": 0.5, "personnel": {"srr": 0, "health": 0, "log": 0}},
+        {"id": "2", "name": "Barangka Drive", "waterLevel": 1.1, "personnel": {"srr": 0, "health": 0, "log": 0}},
+        {"id": "3", "name": "Barangka Ibaba", "waterLevel": 3.0, "personnel": {"srr": 0, "health": 0, "log": 0}},
+        {"id": "11", "name": "Hagdang Bato Libis", "waterLevel": 1.8, "personnel": {"srr": 0, "health": 0, "log": 0}},
+        {"id": "23", "name": "San Jose", "waterLevel": 1.2, "personnel": {"srr": 0, "health": 0, "log": 0}}
     ]
 
+    # The function will now print logs internally and return a simple list.
     simulation_result = run_pso_simulation(sample_frontend_data)
 
     print("\n--- FUNCTION RETURN VALUE ---")
