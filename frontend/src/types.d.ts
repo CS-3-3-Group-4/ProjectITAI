@@ -10,3 +10,14 @@ export interface BarangayData {
   personnel: PersonnelData;
   coordinates: { x: number; y: number };
 }
+
+export type Personnel = {
+  srr: number;
+  health: number;
+  log: number;
+};
+
+export type SimulationResult = {
+  pso: [Record<string, Personnel>, number, number];
+  fa: [Record<string, Personnel>, number, number];
+};
