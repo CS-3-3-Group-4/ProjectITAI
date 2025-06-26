@@ -69,4 +69,4 @@ def simulate(barangays: List[BarangayData]):
 
     # Result is in array format:
     # [Barangay Name, Personnel Allocation (SRR, Health, Log), Fitness Score, Execution Time]
-    return {"message": f"{pso_result, fa_result}"}
+    return {"message": {"pso": pso_result, "fa": fa_result}}
