@@ -224,16 +224,11 @@ export function ActionButtons({ barangays, setBarangays }: ActionButtonsProps) {
           <Alert className="mt-4 border-green-200 bg-green-50">
             <CheckCircle className="h-4 w-4 text-green-600" />
             <AlertDescription className="text-green-800 font-medium">
-              <div className="flex items-center justify-center w-full gap-2">
+              <div className="flex items-center justify-center w-full">
                 <SimulationResultCard
                   title="PSO Results"
                   emoji="📘"
                   result={simulationResult.pso}
-                />
-                <SimulationResultCard
-                  title="FA Results"
-                  emoji="📗"
-                  result={simulationResult.fa}
                 />
               </div>
             </AlertDescription>
