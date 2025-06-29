@@ -18,8 +18,8 @@ export function InteractiveMap({
   };
 
   const getWaterLevelColor = (waterLevel: number) => {
-    if (waterLevel > 2) return "bg-red-500 shadow-red-200";
-    if (waterLevel > 1) return "bg-amber-500 shadow-amber-200";
+    if (waterLevel > 3) return "bg-red-500 shadow-red-200";
+    if (waterLevel > 2) return "bg-amber-500 shadow-amber-200";
     if (waterLevel > 0) return "bg-blue-500 shadow-blue-200";
     return "bg-gray-300 shadow-gray-200";
   };
@@ -130,15 +130,15 @@ export function InteractiveMap({
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-blue-500 rounded-full shadow-sm"></div>
-                <span className="text-slate-600">Low (0-1m)</span>
+                <span className="text-slate-600">Low (0-2m)</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-amber-500 rounded-full shadow-sm"></div>
-                <span className="text-slate-600">Medium (1-2m)</span>
+                <span className="text-slate-600">Medium (2-3m)</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-red-500 rounded-full shadow-sm"></div>
-                <span className="text-slate-600">High (2m+)</span>
+                <span className="text-slate-600">High (3m+)</span>
               </div>
             </div>
           </div>

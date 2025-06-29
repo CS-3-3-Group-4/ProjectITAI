@@ -28,19 +28,23 @@ export function DataSummary({ barangays }: DataSummaryProps) {
   const totalSRR = barangays.reduce((sum, b) => sum + b.personnel.srr, 0);
   const totalHealth = barangays.reduce((sum, b) => sum + b.personnel.health, 0);
   const totalLog = barangays.reduce((sum, b) => sum + b.personnel.log, 0);
+
+  const barangaysWithWater = barangays.filter((b) => b.waterLevel > 0);
   const avgWaterLevel =
-    barangays.reduce((sum, b) => sum + b.waterLevel, 0) / barangays.length;
-  const criticalBarangays = barangays.filter((b) => b.waterLevel > 2);
+    barangaysWithWater.reduce((sum, b) => sum + b.waterLevel, 0) /
+    (barangaysWithWater.length || 1);
+
+  const criticalBarangays = barangays.filter((b) => b.waterLevel > 3);
 
   const getStatusBadge = (waterLevel: number) => {
-    if (waterLevel > 2) {
+    if (waterLevel > 3) {
       return (
         <Badge className="bg-red-100 text-red-700 border-red-200">
           High Water
         </Badge>
       );
     }
-    if (waterLevel > 1) {
+    if (waterLevel > 2) {
       return (
         <Badge className="bg-amber-100 text-amber-700 border-amber-200">
           Medium Water
