@@ -94,11 +94,11 @@ plt.show()
 
 # Figure 3: Convergence Curve
 # Compute min, max, tighter padding
-# min_val = min(convergence_curve)
-# max_val = max(convergence_curve)
-# padding = (max_val - min_val) * 5 # to be configured
-# if padding == 0:
-#     padding = 0.00001
+min_val = min(convergence_curve)
+max_val = max(convergence_curve)
+padding = (max_val - min_val) * 0.05 # to be configured
+if padding == 0:
+    padding = 0.00001
 
 # Plot
 plt.figure(figsize=(10, 6))
@@ -106,9 +106,7 @@ plt.plot(iterations, convergence_curve, 'mo-', linewidth=2, markersize=3)
 plt.title('PSO Convergence Curve', fontweight='bold', fontsize=14)
 plt.xlabel('Iterations', fontsize=12)
 plt.ylabel('Best Fitness', fontsize=12)
-
-# Manually set Y-axis range from 2.470 to 2.471
-plt.ylim(2.470, 2.471)
+plt.ylim(min_val - padding, max_val + padding)
 
 plt.grid(True, alpha=0.3)
 
@@ -119,9 +117,6 @@ plt.ticklabel_format(useOffset=False, style='plain')
 plt.tight_layout()
 plt.show()
 
-
-plt.tight_layout()
-plt.show()
 print(f"\nConvergence Analysis:")
 print(f"Initial fitness: {convergence_curve[0]:.6f}")
 print(f"Final fitness: {convergence_curve[-1]:.6f}")
