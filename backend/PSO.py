@@ -196,20 +196,33 @@ def run_pso_simulation(barangay_input_data):
     """
     # Static Data
     static_barangay_data = {
-        'Addition Hills': {'population': 35914, 'risk': 3}, 'Bagong Silang': {'population': 6867, 'risk': 2},
-        'Barangka Drive': {'population': 13783, 'risk': 2}, 'Barangka Ibaba': {'population': 10555, 'risk': 3},
-        'Barangka Ilaya': {'population': 10255, 'risk': 2}, 'Barangka Itaas': {'population': 5440, 'risk': 1},
-        'Buayang Bato': {'population': 1307, 'risk': 3}, 'Burol': {'population': 2697, 'risk': 1},
-        'Daang Bakal': {'population': 3656, 'risk': 2}, 'Hagdang Bato Itaas': {'population': 9625, 'risk': 1},
-        'Hagdang Bato Libis': {'population': 5029, 'risk': 2}, 'Harapin Ang Bukas': {'population': 4554, 'risk': 2},
-        'Highway Hills': {'population': 30488, 'risk': 2}, 'Hulo': {'population': 27533, 'risk': 3},
-        'Ilaya': {'population': 6135, 'risk': 3}, 'Mabini-J.Rizal': {'population': 5026, 'risk': 2},
-        'Malamig': {'population': 12295, 'risk': 2}, 'Namayan': {'population': 5738, 'risk': 3},
-        'New Zaniga': {'population': 7291, 'risk': 2}, 'Old Zaniga': {'population': 6202, 'risk': 2},
-        'Pag-asa': {'population': 4287, 'risk': 2}, 'Plainview': {'population': 24738, 'risk': 2},
-        'Pleasant Hills': {'population': 6723, 'risk': 1}, 'Poblacion': {'population': 11848, 'risk': 3},
-        'San Jose': {'population': 5988, 'risk': 2}, 'Vergara': {'population': 5420, 'risk': 2},
-        'Wack-Wack Greenhills': {'population': 9109, 'risk': 1}
+        'Addition Hills': {'population': 108896, 'risk': 3},
+        'Bagong Silang': {'population': 4939, 'risk': 2},
+        'Barangka Drive': {'population': 15474, 'risk': 2},
+        'Barangka Ibaba': {'population': 9040, 'risk': 3},
+        'Barangka Ilaya': {'population': 22334, 'risk': 2},
+        'Barangka Itaas': {'population': 11242, 'risk': 1},
+        'Buayang Bato': {'population': 2913, 'risk': 3},
+        'Burol': {'population': 2650, 'risk': 1},
+        'Daang Bakal': {'population': 4529, 'risk': 2},
+        'Hagdang Bato Itaas': {'population': 10267, 'risk': 1},
+        'Hagdang Bato Libis': {'population': 6715, 'risk': 2},
+        'Harapin Ang Bukas': {'population': 4244, 'risk': 2},
+        'Highway Hills': {'population': 43267, 'risk': 2},
+        'Hulo': {'population': 31335, 'risk': 3},
+        'Mabini-J. Rizal': {'population': 7882, 'risk': 2},
+        'Malamig': {'population': 12054, 'risk': 2},
+        'Mauway': {'population': 25800, 'risk': 2},
+        'Namayan': {'population': 7670, 'risk': 3},
+        'New Zañiga': {'population': 8444, 'risk': 2},
+        'Old Zañiga': {'population': 6636, 'risk': 2},
+        'Pag-asa': {'population': 4195, 'risk': 2},
+        'Plainview': {'population': 29378, 'risk': 2},
+        'Pleasant Hills': {'population': 6003, 'risk': 1},
+        'Poblacion': {'population': 16333, 'risk': 3},
+        'San Jose': {'population': 8483, 'risk': 2},
+        'Vergara': {'population': 4357, 'risk': 2},
+        'Wack-Wack Greenhills': {'population': 10678, 'risk': 1}
     }
 
     # Process Input Data
