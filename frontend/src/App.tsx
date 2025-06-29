@@ -13,7 +13,7 @@ function App() {
                   Emergency Response Dashboard
                 </h1>
                 <p className="text-slate-500">
-                  Real-time monitoring and resource allocation
+                  PSO Emergency Response Personnel Allocation
                 </p>
               </div>
               <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-lg border border-blue-100">

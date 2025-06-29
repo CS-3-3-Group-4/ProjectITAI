@@ -7,10 +7,12 @@ import {
   Loader2,
   CheckCircle,
   AlertTriangle,
+  Shuffle,
 } from "lucide-react";
 import type { BarangayData, SimulationResult, Personnel } from "../types";
 import { initialBarangays } from "@/barangays";
 import { useMutation } from "@/hooks/useMutation";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 interface ActionButtonsProps {
   barangays: BarangayData[];
@@ -25,6 +27,8 @@ export function ActionButtons({ barangays, setBarangays }: ActionButtonsProps) {
     error,
     reset,
   } = useMutation(simulate);
+  const [buttonParent] = useAutoAnimate();
+  const [resultParent] = useAutoAnimate();
 
   const handleReset = () => {
     setBarangays(initialBarangays);
@@ -37,6 +41,20 @@ export function ActionButtons({ barangays, setBarangays }: ActionButtonsProps) {
     } catch {
       console.error("Simulation failed.");
     }
+  };
+
+  const handleRandomize = () => {
+    const randomizedBarangays = initialBarangays.map((barangay) => ({
+      ...barangay,
+      waterLevel: Math.floor(Math.random() * 6), // Random water level 0-5
+      personnel: {
+        srr: Math.floor(Math.random() * 501), // Random SRR personnel 0-500
+        health: Math.floor(Math.random() * 501), // Random health personnel 0-500
+        log: Math.floor(Math.random() * 501), // Random logistics personnel 0-500
+      },
+    }));
+    setBarangays(randomizedBarangays);
+    reset(); // Clear any previous simulation results
   };
 
   async function simulate(
@@ -123,7 +141,7 @@ export function ActionButtons({ barangays, setBarangays }: ActionButtonsProps) {
     const barangayEntries = Object.entries(barangayMap);
 
     return (
-      <div className="bg-white border border-green-200 rounded-lg px-4 py-3 shadow-sm mb-4">
+      <div className="bg-white border border-green-200 grid grid-cols-3 gap-6 rounded-lg px-4 py-3 shadow-sm mb-4">
         {barangayEntries.length === 0 ? (
           <div className="text-sm text-gray-500 mb-2">
             No barangay data available
@@ -178,7 +196,10 @@ export function ActionButtons({ barangays, setBarangays }: ActionButtonsProps) {
   return (
     <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
       <CardContent className="p-6">
-        <div className="flex flex-col sm:flex-row gap-4 items-start">
+        <div
+          className="flex flex-col sm:flex-row gap-4 items-start"
+          ref={buttonParent}
+        >
           <div className="flex gap-3">
             <Button
               onClick={handleReset}
@@ -188,6 +209,16 @@ export function ActionButtons({ barangays, setBarangays }: ActionButtonsProps) {
             >
               <RotateCcw className="w-4 h-4 mr-2" />
               Reset All Data
+            </Button>
+
+            <Button
+              onClick={handleRandomize}
+              variant="outline"
+              disabled={isSubmitting}
+              className="h-11 px-6 border-2 border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300"
+            >
+              <Shuffle className="w-4 h-4 mr-2" />
+              Generate Random Data
             </Button>
 
             <Button
@@ -212,29 +243,29 @@ export function ActionButtons({ barangays, setBarangays }: ActionButtonsProps) {
           {isSubmitting && (
             <div className="flex items-center gap-2 text-sm text-slate-600 bg-blue-50 px-3 py-2 rounded-lg">
               <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-              <span>
-                Processing data and running analysis... This may take 10-20
-                seconds
-              </span>
+              <span>Processing data and running analysis...</span>
             </div>
           )}
         </div>
-
-        {simulationResult && (
-          <Alert className="mt-4 border-green-200 bg-green-50">
-            <CheckCircle className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-800 font-medium">
-              <div className="flex items-center justify-center w-full">
-                <SimulationResultCard
-                  title="PSO Results"
-                  emoji="📘"
-                  result={simulationResult.pso}
-                />
-              </div>
-            </AlertDescription>
-          </Alert>
-        )}
-
+        <div>
+          {simulationResult && (
+            <Alert className="mt-4 border-green-200 bg-green-50">
+              <CheckCircle className="h-4 w-4 text-green-600" />
+              <AlertDescription className="text-green-800 font-medium">
+                <div
+                  className="flex items-center justify-center w-full"
+                  ref={resultParent}
+                >
+                  <SimulationResultCard
+                    title="PSO Results"
+                    emoji="📘"
+                    result={simulationResult.pso}
+                  />
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
         {Boolean(error) && (
           <Alert className="mt-4 border-red-200 bg-red-50">
             <AlertTriangle className="h-4 w-4 text-red-600" />
