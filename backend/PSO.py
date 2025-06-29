@@ -18,7 +18,6 @@ class PSOPersonnelAllocator:
         self.weights = weights
         self.lambda_c = lambda_c
 
-        # --- Threshold for affected areas ---
         self.target_barangays = {b_name: b_data for b_name, b_data in self.barangay_data.items() if self.flood_levels.get(b_name, 0) >= 0.5}
         self.num_target_barangays = len(self.target_barangays)
 
@@ -43,7 +42,7 @@ class PSOPersonnelAllocator:
             }
         return demand
 
-    # --- Objective Functions ---
+    # --- Objective Functions (No changes here) ---
     def _objective1_coverage(self, allocation):
         if not self.target_barangays: return 0
         zones_with_personnel = sum(1 for barangay_alloc in allocation.values() if sum(barangay_alloc.values()) > 0)
@@ -118,7 +117,6 @@ class PSOPersonnelAllocator:
         Executes the PSO algorithm and returns detailed logs.
         """
         if self.num_target_barangays == 0:
-            # Return a structure indicating no run was performed
             return { "allocation": {}, "fitness_score": 0 }, [], { "allocation": {}, "fitness_score": 0 }
 
         num_particles = self.pso_params['num_particles']
@@ -132,6 +130,10 @@ class PSOPersonnelAllocator:
             particles_pos[:, i*3+1] *= self.total_personnel['health'] + 1
             particles_pos[:, i*3+2] *= self.total_personnel['log'] + 1
         particles_pos = np.round(particles_pos)
+
+        # --- BUG FIX: Enforce constraints on the initial random population ---
+        for j in range(num_particles):
+            particles_pos[j] = self._enforce_constraints(particles_pos[j])
 
         particles_vel = np.zeros((num_particles, dim))
         pbest_pos = np.copy(particles_pos)
@@ -191,25 +193,36 @@ class PSOPersonnelAllocator:
 def run_pso_simulation(barangay_input_data):
     """
     Main function to run the PSO simulation.
-    This function now prints detailed results and execution time to the terminal
-    and returns the final allocation, fitness score, and execution time.
     """
     # Static Data
     static_barangay_data = {
-        'Addition Hills': {'population': 35914, 'risk': 3}, 'Bagong Silang': {'population': 6867, 'risk': 2},
-        'Barangka Drive': {'population': 13783, 'risk': 2}, 'Barangka Ibaba': {'population': 10555, 'risk': 3},
-        'Barangka Ilaya': {'population': 10255, 'risk': 2}, 'Barangka Itaas': {'population': 5440, 'risk': 1},
-        'Buayang Bato': {'population': 1307, 'risk': 3}, 'Burol': {'population': 2697, 'risk': 1},
-        'Daang Bakal': {'population': 3656, 'risk': 2}, 'Hagdang Bato Itaas': {'population': 9625, 'risk': 1},
-        'Hagdang Bato Libis': {'population': 5029, 'risk': 2}, 'Harapin Ang Bukas': {'population': 4554, 'risk': 2},
-        'Highway Hills': {'population': 30488, 'risk': 2}, 'Hulo': {'population': 27533, 'risk': 3},
-        'Ilaya': {'population': 6135, 'risk': 3}, 'Mabini-J.Rizal': {'population': 5026, 'risk': 2},
-        'Malamig': {'population': 12295, 'risk': 2}, 'Namayan': {'population': 5738, 'risk': 3},
-        'New Zaniga': {'population': 7291, 'risk': 2}, 'Old Zaniga': {'population': 6202, 'risk': 2},
-        'Pag-asa': {'population': 4287, 'risk': 2}, 'Plainview': {'population': 24738, 'risk': 2},
-        'Pleasant Hills': {'population': 6723, 'risk': 1}, 'Poblacion': {'population': 11848, 'risk': 3},
-        'San Jose': {'population': 5988, 'risk': 2}, 'Vergara': {'population': 5420, 'risk': 2},
-        'Wack-Wack Greenhills': {'population': 9109, 'risk': 1}
+        'Addition Hills': {'population': 108896, 'risk': 3},
+        'Bagong Silang': {'population': 4939, 'risk': 2},
+        'Barangka Drive': {'population': 15474, 'risk': 2},
+        'Barangka Ibaba': {'population': 9040, 'risk': 3},
+        'Barangka Ilaya': {'population': 22334, 'risk': 2},
+        'Barangka Itaas': {'population': 11242, 'risk': 1},
+        'Buayang Bato': {'population': 2913, 'risk': 3},
+        'Burol': {'population': 2650, 'risk': 1},
+        'Daang Bakal': {'population': 4529, 'risk': 2},
+        'Hagdang Bato Itaas': {'population': 10267, 'risk': 1},
+        'Hagdang Bato Libis': {'population': 6715, 'risk': 2},
+        'Harapin Ang Bukas': {'population': 4244, 'risk': 2},
+        'Highway Hills': {'population': 43267, 'risk': 2},
+        'Hulo': {'population': 31335, 'risk': 3},
+        'Mabini-J. Rizal': {'population': 7882, 'risk': 2},
+        'Malamig': {'population': 12054, 'risk': 2},
+        'Mauway': {'population': 25800, 'risk': 2},
+        'Namayan': {'population': 7670, 'risk': 3},
+        'New Zañiga': {'population': 8444, 'risk': 2},
+        'Old Zañiga': {'population': 6636, 'risk': 2},
+        'Pag-asa': {'population': 4195, 'risk': 2},
+        'Plainview': {'population': 29378, 'risk': 2},
+        'Pleasant Hills': {'population': 6003, 'risk': 1},
+        'Poblacion': {'population': 16333, 'risk': 3},
+        'San Jose': {'population': 8483, 'risk': 2},
+        'Vergara': {'population': 4357, 'risk': 2},
+        'Wack-Wack Greenhills': {'population': 10678, 'risk': 1}
     }
 
     # Process Input Data
@@ -278,18 +291,19 @@ def run_pso_simulation(barangay_input_data):
 
 
 if __name__ == '__main__':
-
+    # Test harness now shows the array return structure with execution time
     print("--- Running Test Simulation ---")
 
     sample_frontend_data = [
-        {"id": "0", "name": "Addition Hills", "waterLevel": 2.5, "personnel": {"srr": 10, "health": 8, "log": 5}},
-        {"id": "1", "name": "Bagong Silang", "waterLevel": 0.5, "personnel": {"srr": 5, "health": 5, "log": 5}},
-        {"id": "2", "name": "Barangka Drive", "waterLevel": 1.1, "personnel": {"srr": 3, "health": 2, "log": 4}},
-        {"id": "3", "name": "Barangka Ibaba", "waterLevel": 3.0, "personnel": {"srr": 15, "health": 12, "log": 10}},
-        {"id": "25", "name": "Vergara", "waterLevel": 0.0, "personnel": {"srr": 0, "health": 0, "log": 0}},
-        {"id": "26", "name": "Wack-Wack Greenhills", "waterLevel": 0.2, "personnel": {"srr": 2, "health": 2, "log": 1}}
+        {"id": "0", "name": "Addition Hills", "waterLevel": 2.5, "personnel": {"srr": 400, "health": 400, "log": 400}},
+        {"id": "1", "name": "Bagong Silang", "waterLevel": 0.5, "personnel": {"srr": 0, "health": 0, "log": 0}},
+        {"id": "2", "name": "Barangka Drive", "waterLevel": 1.1, "personnel": {"srr": 0, "health": 0, "log": 0}},
+        {"id": "3", "name": "Barangka Ibaba", "waterLevel": 3.0, "personnel": {"srr": 0, "health": 0, "log": 0}},
+        {"id": "11", "name": "Hagdang Bato Libis", "waterLevel": 1.8, "personnel": {"srr": 0, "health": 0, "log": 0}},
+        {"id": "23", "name": "San Jose", "waterLevel": 1.2, "personnel": {"srr": 0, "health": 0, "log": 0}}
     ]
 
+    # The function will now print logs internally and return a simple list.
     simulation_result = run_pso_simulation(sample_frontend_data)
 
     print("\n--- FUNCTION RETURN VALUE ---")

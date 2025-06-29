@@ -62,11 +62,11 @@ def simulate(barangays: List[BarangayData]):
     pso_result = PSO.run_pso_simulation(barangay_input_data)
     print("PSO simulation finished.\n")
     print("--------------------------------------------------------")
-    print("\nStarting FA simulation...")
-    fa_result = FA.run_fa_simulation(barangay_input_data)
-    print("FA simulation finished.")
-    print("--------------------------------------------------------")
+    # print("\nStarting FA simulation...")
+    # fa_result = FA.run_fa_simulation(barangay_input_data)
+    # print("FA simulation finished.")
+    # print("--------------------------------------------------------")
 
     # Result is in array format:
     # [Barangay Name, Personnel Allocation (SRR, Health, Log), Fitness Score, Execution Time]
-    return {"message": {"pso": pso_result, "fa": fa_result}}
+    return {"message": {"pso": pso_result}}

@@ -19,7 +19,6 @@ class FAPersonnelAllocator:
         self.weights = weights
         self.lambda_c = lambda_c
 
-        # --- Threshold for affected areas ---
         self.target_barangays = {b_name: b_data for b_name, b_data in self.barangay_data.items() if self.flood_levels.get(b_name, 0) >= 0.5}
         self.num_target_barangays = len(self.target_barangays)
 
@@ -44,7 +43,7 @@ class FAPersonnelAllocator:
             }
         return demand
 
-    # --- Objective Functions ---
+    # --- Objective Functions (Identical to PSO for fair comparison) ---
     def _objective1_coverage(self, allocation):
         if not self.target_barangays: return 0
         zones_with_personnel = sum(1 for barangay_alloc in allocation.values() if sum(barangay_alloc.values()) > 0)
@@ -140,6 +139,10 @@ class FAPersonnelAllocator:
             fireflies[:, i*3+2] *= self.total_personnel['log'] + 1
         fireflies = np.round(fireflies)
 
+        # --- BUG FIX: Enforce constraints on the initial random population ---
+        for j in range(num_fireflies):
+            fireflies[j] = self._enforce_constraints(fireflies[j])
+
         # Calculate initial light intensity (fitness)
         light_intensity = np.array([self.fitness_function(self._decode_firefly(f)) for f in fireflies])
 
@@ -154,6 +157,7 @@ class FAPersonnelAllocator:
             "fitness_score": float(best_light_intensity)
         }
 
+        # --- Prepare for iteration logging ---
         iteration_log = []
 
         # FA main loop
@@ -228,7 +232,7 @@ def run_fa_simulation(barangay_input_data):
     personnel_availability = {b['name']: b['personnel'] for b in barangay_input_data}
     flood_levels = {b['name']: b['waterLevel'] for b in barangay_input_data}
 
-    # FA Parameters
+    # FA Parameters - Aligned with PSO for direct comparison
     fa_params = {'iterations': 300, 'num_fireflies': 100, 'alpha': 0.5, 'beta0': 1.0, 'gamma': 0.01}
     weights = {'w1': 0.2, 'w2': 0.2, 'w3': 0.2, 'w4': 0.2, 'w5': 0.2}
     lambda_c = {'srr': 0.5, 'health': 0.3, 'log': 0.2}
@@ -288,16 +292,16 @@ def run_fa_simulation(barangay_input_data):
 
 
 if __name__ == '__main__':
-
+    # Test harness
     print("--- Running FA Test Simulation ---")
 
     sample_frontend_data = [
-        {"id": "0", "name": "Addition Hills", "waterLevel": 2.5, "personnel": {"srr": 10, "health": 8, "log": 5}},
-        {"id": "1", "name": "Bagong Silang", "waterLevel": 0.5, "personnel": {"srr": 5, "health": 5, "log": 5}},
-        {"id": "2", "name": "Barangka Drive", "waterLevel": 1.1, "personnel": {"srr": 3, "health": 2, "log": 4}},
-        {"id": "3", "name": "Barangka Ibaba", "waterLevel": 3.0, "personnel": {"srr": 15, "health": 12, "log": 10}},
-        {"id": "25", "name": "Vergara", "waterLevel": 0.0, "personnel": {"srr": 0, "health": 0, "log": 0}},
-        {"id": "26", "name": "Wack-Wack Greenhills", "waterLevel": 0.2, "personnel": {"srr": 2, "health": 2, "log": 1}}
+        {"id": "0", "name": "Addition Hills", "waterLevel": 2.5, "personnel": {"srr": 400, "health": 400, "log": 400}},
+        {"id": "1", "name": "Bagong Silang", "waterLevel": 0.5, "personnel": {"srr": 0, "health": 0, "log": 0}},
+        {"id": "2", "name": "Barangka Drive", "waterLevel": 1.1, "personnel": {"srr": 0, "health": 0, "log": 0}},
+        {"id": "3", "name": "Barangka Ibaba", "waterLevel": 3.0, "personnel": {"srr": 0, "health": 0, "log": 0}},
+        {"id": "11", "name": "Hagdang Bato Libis", "waterLevel": 1.8, "personnel": {"srr": 0, "health": 0, "log": 0}},
+        {"id": "23", "name": "San Jose", "waterLevel": 1.2, "personnel": {"srr": 0, "health": 0, "log": 0}}
     ]
 
     simulation_result = run_fa_simulation(sample_frontend_data)
