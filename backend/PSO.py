@@ -131,7 +131,7 @@ class PSOPersonnelAllocator:
             particles_pos[:, i*3+2] *= self.total_personnel['log'] + 1
         particles_pos = np.round(particles_pos)
 
-        # --- BUG FIX: Enforce constraints on the initial random population ---
+        # --- Enforce constraints on the initial random population ---
         for j in range(num_particles):
             particles_pos[j] = self._enforce_constraints(particles_pos[j])
 
